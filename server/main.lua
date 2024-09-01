@@ -135,7 +135,7 @@ RegisterNetEvent('qb-mechanicjob:server:sprayVehicleCustom', function(netId, sec
     FreezeEntityPosition(vehicle, false)
 end)
 
-RegisterNetEvent('qb-mechanicjob:server:sprayVehicle', function(netId, primary, secondary, pearlescent, wheel, colors)
+RegisterNetEvent('qb-mechanicjob:server:sprayVehicle', function(netId, primary, secondary, pearlescent, wheel, dashboard, interior, colors)
     local vehicle = NetworkGetEntityFromNetworkId(netId)
     local vehicleCoords = GetEntityCoords(vehicle)
     FreezeEntityPosition(vehicle, true)
@@ -175,6 +175,20 @@ RegisterNetEvent('qb-mechanicjob:server:sprayVehicle', function(netId, primary, 
         -- local pearlescentColor, wheelColor = GetVehicleExtraColours(vehicle) -- does not exist yet
         -- SetVehicleExtraColours(vehicle, tonumber(pearlescent) or pearlescentColor, tonumber(wheel) or wheelColor) -- does not exist yet
         TriggerClientEvent('qb-mechanicjob:client:vehicleSetColors', -1, netId, 'wheel', wheel)
+        StopParticles()
+    end
+
+    if colors.dashboard then
+        StartParticles(vehicleCoords, netId, colors.dashboard)
+        Wait(Config.PaintTime * 1000)
+        TriggerClientEvent('qb-mechanicjob:client:vehicleSetColors', -1, netId, 'dashboard', dashboard)
+        StopParticles()
+    end
+
+    if colors.interior then
+        StartParticles(vehicleCoords, netId, colors.interior)
+        Wait(Config.PaintTime * 1000)
+        TriggerClientEvent('qb-mechanicjob:client:vehicleSetColors', -1, netId, 'interior', interior)
         StopParticles()
     end
 

@@ -49,6 +49,7 @@ local Translations = {
         interior = 'Interior',
         exterior = 'Exterior',
         wheels = 'Ruedas',
+        dashboard = 'Panel',
         neons = 'Neones',
         xenon = 'Faros',
         window_tint = 'Polarizado',

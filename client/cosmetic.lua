@@ -39,6 +39,7 @@ end
 
 local function PaintList(category)
     local paintOptions = GetPaints(category)
+    local metallicPaintOptions = GetPaints('Metallic')
     local dialog = exports['qb-input']:ShowInput({
         header = Lang:t('menu.paint_vehicle'),
         submitText = Lang:t('menu.submit'),
@@ -66,22 +67,36 @@ local function PaintList(category)
                 name = 'wheelpaint',
                 type = 'select',
                 options = paintOptions
+            },
+            {
+                text = Lang:t('menu.dashboard'),
+                name = 'dashboard',
+                type = 'select',
+                options = metallicPaintOptions
+            },
+            {
+                text = Lang:t('menu.interior'),
+                name = 'interior',
+                type = 'select',
+                options = metallicPaintOptions
             }
         }
     })
     if not dialog then return end
-    if dialog.primarypaint and dialog.secondarypaint and dialog.pearlescentpaint and dialog.wheelpaint then
+    if dialog.primarypaint and dialog.secondarypaint and dialog.pearlescentpaint and dialog.wheelpaint and dialog.dashboard and dialog.interior then
         local colors = {
             primary = dialog.primarypaint ~= 'none' and HexToRGB(GetHex(category, dialog.primarypaint)) or nil,
             secondary = dialog.secondarypaint ~= 'none' and HexToRGB(GetHex(category, dialog.secondarypaint)) or nil,
             pearlescent = dialog.pearlescentpaint ~= 'none' and HexToRGB(GetHex(category, dialog.pearlescentpaint)) or nil,
-            wheel = dialog.wheelpaint ~= 'none' and HexToRGB(GetHex(category, dialog.wheelpaint)) or nil
+            wheel = dialog.wheelpaint ~= 'none' and HexToRGB(GetHex(category, dialog.wheelpaint)) or nil,
+            dashboard = dialog.dashboard ~= 'none' and HexToRGB(GetHex('Metallic', dialog.dashboard)) or nil,
+            interior = dialog.interior ~= 'none' and HexToRGB(GetHex('Metallic', dialog.interior)) or nil
         }
         local vehicle, distance = QBCore.Functions.GetClosestVehicle()
         if vehicle == 0 or distance > 5.0 then return end
         local netId = NetworkGetNetworkIdFromEntity(vehicle)
         if isPainting then return end
-        TriggerServerEvent('qb-mechanicjob:server:sprayVehicle', netId, dialog.primarypaint, dialog.secondarypaint, dialog.pearlescentpaint, dialog.wheelpaint, colors)
+        TriggerServerEvent('qb-mechanicjob:server:sprayVehicle', netId, dialog.primarypaint, dialog.secondarypaint, dialog.pearlescentpaint, dialog.wheelpaint, dialog.dashboard, dialog.interior, colors)
     end
 end
 
@@ -657,7 +672,15 @@ RegisterNetEvent('qb-mechanicjob:client:vehicleSetColors', function(netId, secti
         SetVehicleExtraColours(vehicle, pearlescentColor, tonumber(colorIndex))
     end
 
-        
+    if section == 'dashboard' then
+        SetVehicleDashboardColor(vehicle, tonumber(colorIndex))
+    end
+
+    if section == 'interior' then
+        SetVehicleInteriorColor(vehicle, tonumber(colorIndex))
+    end
+
+
     local props = QBCore.Functions.GetVehicleProperties(vehicle)
     TriggerServerEvent('qb-mechanicjob:server:SaveVehicleProps', props)
 end)
